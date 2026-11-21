@@ -1,0 +1,13 @@
+# Revisione etica di BioPulse-Agent
+
+## Identificazione
+Un falso livello verde, un calo di HRV o un picco di frequenza cardiaca interpretato male può indurre atleta o preparatore a sovraccaricare, minimizzare sintomi o scambiare un indice sperimentale per diagnosi o idoneità. HRV, sonno, carico e note RPE sono dati intimi: un accesso non necessario da parte dello staff può creare sorveglianza, ansia da prestazione o esclusione dalle convocazioni. Sensori e soglie possono inoltre sovra- o sotto-segnalare per età, sesso e ciclo mestruale, disabilità, farmaci o condizioni individuali non rappresentate nei test.
+
+## Analisi
+Nel contesto sportivo un preparatore che si fidi di un falso verde può prescrivere un carico inappropriato nonostante sintomi o recupero percepito scarso, mentre un falso rosso può limitare inutilmente la partecipazione. Se gli atleti temono che sonno, stress o RPE influenzino convocazioni e selezione, possono modificare le abitudini o omettere informazioni, rendendo il quadro meno affidabile e aumentando la pressione psicologica. Le baseline individuali aiutano a contestualizzare HRV e frequenza cardiaca, ma non eliminano bias dei sensori né compensano soglie non validate su gruppi diversi.
+
+## Risposta di progettazione
+Il motore White-Box assegna il livello fuori dall'LLM; prompt e autoverifica vietano diagnosi, verificano alcuni vincoli di intensità e coerenza numerica, mentre i sintomi d'allarme attivano un messaggio statico con invito a chiamare il 112. Nei casi rossi la bozza personalizzata è trattenuta e il caso è registrato, ma il testo dichiara che nessuna revisione umana è confermata; l'LLM dispone solo di strumenti di lettura e non può inviare avvisi. La beta pubblica usa account ospite separati e temporanei, richiede una scelta esplicita per i dati sintetici e blocca gli avvisi esterni; prompt, metriche sintetiche e testo libero possono comunque essere inviati a Groq, non c'è un filtro completo dei dati identificativi e la telemetria di Agno è disattivata.
+
+## Limiti onesti
+La demo usa solo dati sintetici: gli adapter HealthKit/Health Connect leggono localmente ma non inviano dati al backend e non sono validati su dispositivi reali. La beta ospite scade dopo due ore e prevede pulizia automatica e limiti di richiesta, ma l'hosting gratuito può sospendersi e la cache o il provider LLM hanno tempi di conservazione distinti; non sono collegati account professionisti, destinatari di notifiche o revisione clinica effettiva, e soglie e raccomandazioni non hanno validazione clinica. Prima di un pilota servono valutazione rappresentativa dei bias, verifica privacy/legale dei servizi, test su dispositivi e un flusso autorizzato di accesso e revisione professionale.

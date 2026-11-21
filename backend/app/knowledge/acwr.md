@@ -1,0 +1,4 @@
+title: ACWR (Acute-to-Chronic Workload Ratio)
+source: BOZZA NON REVISIONATA. Riferimenti da verificare: Gabbett TJ, Br J Sports Med 2016 (training-injury prevention paradox); Impellizzeri FM et al., Int J Sports Physiol Perform 2020 (critica metodologica all'ACWR).
+
+Nel prototipo il rapporto è calcolato come media del carico degli ultimi 7 giorni divisa per la media degli ultimi 28 giorni. Le fasce 0.8, 1.3 e 1.5 sono soglie esplorative implementate nel software, non confini universalmente validati né prova che un allenamento sia sicuro o pericoloso. La letteratura e le scelte di finestra/metodo sono controverse; la scheda e le soglie richiedono verifica bibliografica e revisione specialistica. Non usare questa sintesi per prescrivere carichi o stimare individualmente il rischio d'infortunio.

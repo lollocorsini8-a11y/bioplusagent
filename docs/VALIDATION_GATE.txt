@@ -1,0 +1,200 @@
+BioPulse-Agent - revisione specialistica e gate per il pilota
+Data di revisione specialistica: da compilare
+Stato: BOZZA PER REVISIONE - nessuna approvazione specialistica registrata
+
+1. SCOPO E LIMITI
+-----------------
+Questa scheda prepara la revisione delle soglie, dei profili e delle fonti.
+Non costituisce validazione clinica, parere medico, approvazione etica o
+autorizzazione a usare il sistema con atleti. Non sono stati coinvolti
+specialisti esterni e non è stato avviato un pilota con persone.
+
+I test automatici e l'eval corrente usano soltanto dati sintetici e scenari
+costruiti dal progetto. I risultati misurano il comportamento rispetto a quei
+test; non stimano accuratezza, sensibilità, specificità o utilità clinica.
+Continuare a usare esclusivamente dati sintetici finché non siano state
+ottenute le approvazioni etiche, legali e organizzative appropriate.
+
+Decisione attuale: PILOTA CON UTENTI NON AUTORIZZATO.
+Gate richiesto: revisione specialistica documentata, fonti verificate, piano
+etico/privacy approvato e criteri di monitoraggio concordati prima di ogni
+studio con persone.
+
+2. FATTI OSSERVATI NEL CODICE (NON RACCOMANDAZIONI CLINICHE)
+-----------------------------------------------------------
+Riferimento principale: backend/app/whitebox/metrics.py.
+
+- ACWR: media del carico dei 7 giorni di calendario divisa per quella dei
+  28 giorni; zona danger solo sopra 1.5, caution sopra 1.3, fascia indicata
+  optimal da 0.8 a 1.3 e undertraining sotto 0.8. Il report ora lo calcola
+  solo se sono registrati i carichi di tutti i 28 giorni. Un giorno senza
+  record non è più sostituito da zero e genera un flag informativo.
+- Carico: session-RPE = RPE x durata in minuti; i giorni o le sessioni con
+  valori assenti contribuiscono zero.
+- HRV/RMSSD: smoothing sui 3 giorni recenti; baseline individuale sui 28
+  giorni precedenti; lo z-score usa la deviazione standard campionaria e
+  richiede almeno 7 misure. Sotto -1.0 è yellow; sotto -1.5 è red.
+- Frequenza a riposo: baseline individuale con lo stesso schema; z-score
+  maggiore di 1.5 genera un flag yellow.
+- Sonno: efficienza sotto 75% genera un flag yellow; sotto 85% riduce il
+  punteggio. Il singolo valore più recente è usato nel report.
+- SpO2: un singolo valore sotto 92% genera un flag red. La scheda red_flags
+  parla invece di saturazione bassa persistente: questa differenza va risolta.
+- Readiness: punteggio iniziale 100 con decrementi fissi (ad esempio ACWR
+  danger -40, HRV red -35, sonno basso -10); un red limita il punteggio a 39.
+  Il livello è red se c'è un flag red, yellow in presenza di flag yellow o
+  punteggio sotto 70, altrimenti green; dati insufficienti possono dare
+  livello unknown.
+- Profili standard, paralympic e master sono registrati nel profilo atleta e
+  visualizzati nell'interfaccia, ma non sono input di compute_strain_report e
+  non cambiano soglie, formule, scoring o guardrail. Oggi non c'è adattamento
+  algoritmico specifico per profilo.
+
+Riferimenti di codice:
+  backend/app/whitebox/metrics.py
+  backend/app/whitebox/sanitizer.py
+  backend/app/simulator.py
+  backend/app/knowledge/
+  backend/eval/run_eval.py
+  docs/EVAL_RESULTS.md
+
+3. QUESTIONI DA SOTTOPORRE AGLI SPECIALISTI
+-------------------------------------------
+Per ogni punto, registrare decisione, motivazione, evidenza bibliografica
+completa (DOI/URL e data di consultazione), contesto di applicabilità,
+responsabile e data. Esiti ammessi: approvato per prototipo, modificare,
+respinto, sospeso in attesa di evidenze.
+
+A. Medicina dello sport / fisiologia dell'esercizio
+   [ ] ACWR: validità d'uso, finestre 7/28, soglie 0.8/1.3/1.5 e wording
+       che associa il rapporto al rischio.
+   Prototipo aggiornato: i giorni senza record non sono più conteggiati come
+   riposo; l'ACWR è indisponibile se manca anche un solo carico nella finestra
+   completa di 28 giorni. [ ] Lo specialista deve valutare se il requisito
+   completo è appropriato e se un carico zero registrato indica davvero riposo.
+   [ ] sRPE: scala, timing, qualità dei dati e trattamento di riposo/sessioni
+       mancanti.
+   [ ] HRV: protocollo di misura, dispositivo, smoothing di 3 giorni,
+       baseline di 28 giorni, minimo 7 punti e cut-off -1.0/-1.5.
+   [ ] Frequenza a riposo: protocollo, baseline e cut-off z > 1.5.
+   [ ] Sonno: uso del singolo giorno, soglie 75% e 85%, variabilità tra
+       dispositivi e significato dei decrementi readiness.
+   [ ] Readiness: giustificazione dei pesi, combinazione dei segnali,
+       soglie green/yellow/red e comunicazione senza interpretazione
+       diagnostica.
+
+B. Cardiologia / medicina dello sport e validazione dei sensori
+   [ ] SpO2: soglia sotto 92%, necessità di persistenza/conferma, qualità del
+       segnale, posizione, artefatti e procedura di escalation.
+   [ ] Sintomi d'allarme e messaggi: copertura, istruzioni e distinzione tra
+       urgenza e contatto medico; coerenza con la scheda red_flags.
+
+C. Medicina dello sport adattata e rappresentanti degli atleti
+   [ ] Chiarire se i profili attuali siano solo descrittivi o se siano
+       appropriate regole specifiche; non assumere che una singola categoria
+       paralympic rappresenti condizioni eterogenee.
+   [ ] Identificare condizioni/contesti esclusi, misure non applicabili,
+       accomodamenti, rischio di disparità e comportamento quando una misura
+       non è disponibile.
+   [ ] Verificare che il linguaggio non presenti soglie generiche come
+       individualmente validate.
+
+D. Revisione bibliografica
+   Per ogni fonte, verificare citazione completa, versione, qualità,
+   popolazione, endpoint, limiti e corrispondenza tra fonte e affermazione.
+   Le schede attuali dichiarano riferimenti da verificare e sono sintesi, non
+   fonti cliniche curate.
+   [ ] ACWR: Gabbett (2016); critica metodologica di Impellizzeri et al.
+       (2020); verificare il dibattito e non descrivere 0.8-1.3 come zona
+       universalmente sicura.
+   [ ] HRV: Plews et al. (2013); Shaffer e Ginsberg (2017); verificare
+       protocollo, popolazione e soglie adottate.
+   [ ] sRPE: Foster et al. (2001); verificare scala e contesto di raccolta.
+   [ ] Caldo/idratazione: Sawka et al. (2007); verificare raccomandazioni e
+       limiti di applicazione individuale.
+   [ ] Fitness/longevità: Mandsager et al. (2018); distinguere associazione
+       osservazionale da causalità e da raccomandazione individuale.
+   [ ] Sonno, segnali d'allarme e profili adattivi: le schede non riportano
+       una bibliografia completa sufficiente; reperire e verificare fonti
+       appropriate con gli specialisti.
+
+4. REGISTRO DELLE DECISIONI SPECIALISTICHE
+------------------------------------------
+Non compilare con approvazioni presunte. Una firma non sostituisce le
+approvazioni etiche, regolatorie o del titolare del trattamento.
+
+Revisore / qualifica:
+Organizzazione e ambito di competenza:
+Data:
+Versione del codice/documentazione esaminata:
+Conflitti di interesse dichiarati:
+Decisione per ciascun punto (riferimento A/B/C/D):
+Motivazione ed evidenza:
+Modifiche richieste:
+Firma o riferimento alla registrazione approvata:
+Stato complessivo: NON REVISIONATO / IN REVISIONE / APPROVATO CON RISERVE /
+                   RESPINTO
+
+5. GATE PRIMA DI UN PILOTA CON PERSONE
+--------------------------------------
+Non avviare un pilota finché ciascun punto applicabile non ha un proprietario
+e un'approvazione documentata:
+
+[ ] Revisione specialistica di soglie, profili, messaggi e fonti completata.
+[ ] Modifiche concordate implementate e riesaminate; suite ed eval aggiornate.
+[ ] Protocollo, popolazione, inclusione/esclusione e supervisione clinica
+    approvati dalle sedi e dagli organismi competenti.
+[ ] Revisione privacy/legale, base giuridica, informativa, consenso,
+    minimizzazione, retention, sicurezza e gestione degli incidenti approvate.
+[ ] Verificata la necessità di approvazione etica e regolatoria prima di
+    reclutare o raccogliere qualsiasi dato.
+[ ] Fonti wearable, qualità e limiti dei dispositivi documentati; i dati
+    sintetici non vengono confusi con dati reali.
+[ ] Piano di monitoraggio, eventi avversi, escalation, interruzione e
+    responsabilità definiti.
+[ ] Piano statistico, numerosità/campione, durata e criteri di successo
+    approvati prima di vedere i risultati.
+
+Le caselle non sono attestazioni legali: richiedono conferma da parte dei
+responsabili competenti. Fino al gate superato, continuare soltanto con
+simulazioni sintetiche.
+
+6. MISURE DA PRE-REGISTRARE PER UN EVENTUALE PILOTA
+--------------------------------------------------
+Usabilità - SUS:
+- Usare la versione SUS standard a 10 item e registrare versione linguistica,
+  momento di somministrazione e dati mancanti.
+- Calcolare il punteggio standard 0-100 secondo le regole SUS; non
+  interpretarlo come percentuale. L'obiettivo provvisorio del README è >80,
+  da confermare nel protocollo prima dello studio.
+- Riportare numero di partecipanti, distribuzione/dispersione e intervallo
+  d'incertezza, non soltanto la media.
+
+Adesione:
+- Definire prima cosa conta come sessione suggerita/ammissibile, la finestra
+  temporale, le esclusioni (ad esempio indicazione clinica di non allenarsi),
+  rinvii, cancellazioni, mancata risposta e dati non osservabili.
+- Possibile formula da ratificare nel protocollo:
+  sessioni ammissibili completate / sessioni ammissibili pianificate x 100.
+- Riportare numeratore, denominatore, motivi di non completamento e
+  intervallo d'incertezza. Evitare di trattare una raccomandazione dell'agente
+  come prescrizione clinica.
+- L'obiettivo provvisorio del README è >85%, da confermare prima dello studio.
+
+Altre decisioni da pre-registrare:
+popolazione e setting; periodo di osservazione; definizione di esposizione;
+strumenti/questionari; dati mancanti; analisi; eventi avversi; stop rules;
+criteri go/no-go. Non scegliere retrospettivamente le definizioni per
+raggiungere gli obiettivi.
+
+7. STATO AL MOMENTO DELLA PREPARAZIONE
+--------------------------------------
+- Revisione specialistica: non effettuata.
+- Fonti bibliografiche: citazioni parziali nelle schede, da verificare.
+- Validazione delle soglie/profili: non effettuata.
+- Prove disponibili: regressioni automatiche e valutazione su dati sintetici,
+  documentate in docs/EVAL_RESULTS.md e docs/TEST_RESULTS.txt.
+- SUS e adesione: nessuna misurazione; target >80 e >85% sono obiettivi
+  provvisori per un futuro studio, non risultati.
+- Pilota con utenti: non avviato e non autorizzato da questa scheda.
+- Dati di persone reali: non usare nei test correnti.

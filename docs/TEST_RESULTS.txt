@@ -1,0 +1,96 @@
+BioPulse-Agent - verifica ambiente e test
+Data: 2026-11-12
+
+Ambiente
+--------
+Windows
+Python: 3.12.10 (backend/.venv, creato dal launcher py)
+Node.js: 26.13.0 (C:\Users\gianr\Desktop\node)
+npm: 11.20.0
+Frontend: dipendenze installate da package-lock.json con npm ci
+Backend: dipendenze installate da requirements-lock.txt
+
+Risultati
+---------
+Backend:
+  pip check: superato, nessuna dipendenza rotta
+  pytest -q: 50 passed
+  Nuovi test autenticazione: login/logout, sessione scaduta, CSRF,
+  isolamento atleta-professionista e restrizioni di ruolo; retention e
+  cancellazione account atleta; rate limit login; aggiornamento del profilo
+  atleta protetto da CSRF e non consentito a professionisti o profili non assegnati.
+  Nuovi test: registrazione atleta solo in demo, consenso inizialmente disattivato,
+  dati mancanti non interpretati come riposo, sincronizzazione delle schede RAG.
+  Sincronizzazione wearable sintetica: consenso, cursore incrementale,
+  upsert idempotente e retry senza avanzare il cursore su record non validi.
+  Avviso non bloccante: Starlette segnala la futura deprecazione dell'integrazione
+  TestClient con httpx.
+
+Valutazione simulata:
+  Rilevamento overload: 100% (200/200)
+  Rilevamento calo HRV: 100% (200/200)
+  Falsi rossi, atleta stabile: 1.0% (2/200)
+  Falsi rossi, settimana di scarico: 0.0% (0/200)
+  Motore White-Box: p50 2.85 ms, p95 51.56 ms, max 439.70 ms
+  Guardrail e sintomi: metriche complete in EVAL_RESULTS.md
+  Nota: la latenza dipende dal carico della macchina e varia tra esecuzioni.
+
+Frontend:
+  npm ci: superato
+  npm run build: superato; compilazione, controllo tipi e generazione pagine
+  npm audit: 0 vulnerabilita' (override PostCSS 8.5.23 per la dipendenza
+  annidata in Next 15; nessun aggiornamento breaking di Next richiesto).
+
+Servizi e integrazione
+----------------------
+Docker Desktop 4.99.0 / Engine 29.9.3: avviato con contesto desktop-linux.
+PostgreSQL 16 con estensione pgvector: container healthy; pg_isready e query
+su pg_extension superati.
+Redis 7: container healthy; redis-cli ping restituisce PONG.
+Backend container: /api/health riporta postgresql+pgvector e backend Redis;
+seed delle 8 schede di conoscenza completato.
+Verifica API end-to-end su PostgreSQL: seed atleta, lettura di 28 giorni,
+chat sintomi con SMS simulato correttamente dichiarato e cancellazione dei
+dati di prova completate.
+Frontend container: homepage su http://localhost:3000 restituisce HTTP 200.
+docker compose up -d --build: build backend, npm ci e build produzione Next.js
+superati; i quattro servizi (db, redis, backend, frontend) risultano attivi.
+Migrazioni: upgrade Alembic iniziale e confronto dei modelli superati su un
+database PostgreSQL temporaneo; database locale esistente marcato 0001_initial
+e `alembic check` senza differenze.
+Backup/ripristino: pg_dump custom-format verificato e restore in un database
+temporaneo superati; il database di sviluppo attivo non è stato modificato
+dalla prova e l'archivio temporaneo è stato rimosso.
+Nuova verifica dopo gli ultimi cambi: backend health HTTP 200, opzioni auth
+con registrazione demo attiva, frontend HTTP 200.
+Verifica successiva alle modifiche di autenticazione: API health HTTP 200 con
+PostgreSQL/pgvector e Redis; homepage HTTP 200. Le porte pubblicate sono
+limitate a 127.0.0.1 (5432, 6379, 8000, 3000). Login con credenziali errate
+risponde HTTP 401 e crea il contatore hashato del rate limit su Redis.
+Verifica wearable sintetica dopo il rebuild: su PostgreSQL il primo sync ha
+acquisito 42 record; il sync ripetuto ha riletto 2 giorni di sovrapposizione
+senza duplicare metriche (42 totali); il retry dopo payload non valido non
+avanza il cursore; la cancellazione del profilo rimuove anche lo stato sync.
+API e frontend hanno risposto HTTP 200. Nessuna API wearable reale e' stata
+contattata e nessun dato di persona e' stato usato.
+La virtualizzazione firmware e' stata inizialmente segnalata come disabilitata
+da Windows; nonostante questo Docker Desktop e' poi partito con WSL 2 e i
+container Linux sono operativi. Lo stato CIM del firmware puo' essere
+inattendibile in ambiente virtualizzato: prevale la verifica del daemon e dei
+container funzionanti.
+I test pytest continuano a usare SQLite isolato dal fixture
+backend/tests/conftest.py; e' stata eseguita separatamente la smoke test sul
+database PostgreSQL reale del compose.
+Non sono state eseguite chiamate reali a Groq o Twilio.
+
+Comandi usati
+-------------
+Backend:
+  py -3.12 -m venv .venv
+  .venv\Scripts\python.exe -m pip install -r requirements-lock.txt
+  .venv\Scripts\python.exe -m pytest -q
+  .venv\Scripts\python.exe eval\run_eval.py --write
+
+Frontend:
+  npm ci
+  npm run build
