@@ -24,7 +24,10 @@ export default function DashboardPage() {
           {session.user.role === "athlete" ? "Parla con BioPulse" : "Apri l'area clinica"} <span>↗</span>
         </Link>
       </motion.div>
-      <div className="demo-banner"><span>i</span><p><b>Ambiente dimostrativo.</b> Dati e wearable sono simulati; indicatori e soglie non sono validati clinicamente.</p><Link href="/ethics">Scopri i limiti ↗</Link></div>
+      <div className="demo-banner"><span>i</span><p><b>Ambiente dimostrativo.</b> Dati e wearable sono simulati; indicatori e soglie non sono validati clinicamente.</p>
+        {(session.demo_mode || session.user.demo_guest) && <Link href="/profile">Scegli uno scenario ↗</Link>}
+        <Link href="/ethics">Scopri i limiti ↗</Link>
+      </div>
       {error && <p role="alert" className="form-error">{error}</p>}
       {loading && !data && <div className="dashboard-loading">Caricamento dei dati dimostrativi…</div>}
       {data && report && <>

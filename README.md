@@ -51,9 +51,11 @@ Il motore White-Box separa il calcolo del rischio dalla spiegazione LLM; consens
 
 ## Beta pubblica per la commissione
 
-Il codice della beta è predisposto, ma **non è ancora distribuito online**; qui verrà aggiunto il link pubblico dopo il collaudo end-to-end. La commissione potrà avviare una sessione ospite senza account: ogni sessione ha un profilo separato, dati sintetici nello scenario iniziale di carico elevato, durata di due ore e limiti alle richieste. L'interfaccia richiede una scelta esplicita per elaborare i dati sintetici; gli avvisi esterni sono disabilitati. Non inserire dati personali o sanitari reali.
+**Apri la beta:** [bioplusagent.vercel.app](https://bioplusagent.vercel.app/). Il percorso ospite, l'onboarding, la panoramica e il profilo sono stati verificati sul sito; l'aggiornamento che rende selezionabili tutti gli scenari deve essere distribuito prima che la selezione sia disponibile online.
 
-L'architettura prevista è frontend Next.js su Vercel e API FastAPI con PostgreSQL/pgvector e Redis su Render; la chiave Groq resta un segreto del backend. I piani gratuiti possono sospendere o rimuovere risorse, quindi la demo online è una preview temporanea, non un servizio sempre disponibile. Per istruzioni, variabili e collaudo vedere [la guida di deploy gratuito](./docs/DEPLOY_FREE.md). Tenere come riserva la [procedura di avvio locale](#avvio-rapido) e il video dimostrativo.
+Per provarla, scegli **“Prova la beta con dati sintetici”**, completa l'orientamento e il consenso separato per i soli dati sintetici, quindi consulta la panoramica. Dopo il deploy dell'aggiornamento, dalla panoramica usa **“Scegli uno scenario”** oppure apri **Profilo → Dati e consensi** per selezionare **Atleta in equilibrio**, **Sovraccarico**, **Calo della HRV** o **Settimana di scarico**; torna alla panoramica per vedere le metriche e usa BioPulse AI per interrogare l'agente. Ogni sessione ospite ha un profilo separato e temporaneo (due ore) con limiti alle richieste; gli avvisi esterni sono disabilitati. Non inserire dati personali o sanitari reali: nessuno scenario proviene da uno smartwatch.
+
+La beta online usa un frontend Next.js su Vercel e un'API FastAPI con PostgreSQL/pgvector e Redis su Render; la chiave Groq resta un segreto del backend. I piani gratuiti possono sospendere o rimuovere risorse, quindi la demo è una preview temporanea, non un servizio sempre disponibile. Per istruzioni, variabili e collaudo vedere [la guida di deploy gratuito](./docs/DEPLOY_FREE.md). Tenere come riserva la [procedura di avvio locale](#avvio-rapido) e il video dimostrativo.
 
 ## 7. Portale e primo accesso
 

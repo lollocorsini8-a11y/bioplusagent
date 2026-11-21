@@ -16,9 +16,14 @@ export default function AthleteRail({ data, athleteId, canManage, demoMode, isPu
 }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [selectedScenario, setSelectedScenario] = useState<Scenario | null>(null);
   async function load(s: Scenario) {
     setBusy(s); setMsg(null);
-    try { onChange(await seedDemo(athleteId, s)); }
+    try {
+      onChange(await seedDemo(athleteId, s));
+      setSelectedScenario(s);
+      setMsg(`Scenario caricato: ${SCENARIOS.find(option => option.id === s)?.title ?? s}. Dati sintetici aggiornati; apri la panoramica per consultarli.`);
+    }
     catch (e) { setMsg((e as Error).message); } finally { setBusy(null); }
   }
   async function synchronizeWearable() {
@@ -61,12 +66,14 @@ export default function AthleteRail({ data, athleteId, canManage, demoMode, isPu
         </button>
       </fieldset>}
 
-      {canManage && demoMode && <fieldset>
+      {canManage && (demoMode || isPublicDemo) && <fieldset>
         <legend className="mb-2 font-semibold">Scenario di dati simulati</legend>
+        <p className="mb-2 text-xs text-mute">Scegli un caso sintetico per aggiornare le metriche della panoramica. Nessun dispositivo o dato reale è collegato.</p>
         <div className="space-y-2">
           {SCENARIOS.map(s => (
             <button key={s.id} onClick={() => load(s.id)} disabled={busy !== null || !data?.athlete.consent_data}
-              className="w-full rounded-lg border border-line bg-paper p-3 text-left transition hover:border-sea disabled:opacity-60">
+              aria-pressed={selectedScenario === s.id}
+              className={`w-full rounded-lg border p-3 text-left transition hover:border-sea disabled:opacity-60 ${selectedScenario === s.id ? "border-sea bg-sea-soft" : "border-line bg-paper"}`}>
               <span className="block font-semibold">{busy === s.id ? "Carico…" : s.title}</span>
               <span className="block text-mute">{s.text}</span>
             </button>
