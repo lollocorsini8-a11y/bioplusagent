@@ -45,19 +45,19 @@ Obiettivi da misurare con utenti reali (non ancora misurati): usabilità SUS > 8
 
 La latenza end-to-end con l'LLM è tipicamente 1-4 s (rete + Groq): l'obiettivo "<800 ms" del documento iniziale riguarda solo il motore deterministico.
 
-## Revisione etica
+## 6. Revisione etica
 
 Il motore White-Box separa il calcolo del rischio dalla spiegazione LLM; consenso, guardrail e trattenimento delle bozze rosse riducono alcuni rischi, ma non sostituiscono una revisione clinica. La demo usa dati sintetici e non ha wearable sincronizzati né professionisti o notifiche collegati. [Leggi la revisione etica completa](./ethics-review.md) e il [registro dei test T1–T5](./backend/tests/test_edge_cases.py).
 
-## Beta pubblica per la commissione
+## 7. Beta pubblica per la commissione
 
-**Apri la beta:** [bioplusagent.vercel.app](https://bioplusagent.vercel.app/). Il percorso ospite, l'onboarding, la panoramica e il profilo sono stati verificati sul sito; l'aggiornamento che rende selezionabili tutti gli scenari deve essere distribuito prima che la selezione sia disponibile online.
+**Apri la beta:** [https://bioplusagent.vercel.app/](https://bioplusagent.vercel.app/). Il percorso ospite, l'onboarding, la panoramica e il profilo sono disponibili online; il collaudo ha verificato che si possano caricare tutti e quattro gli scenari, vedere le metriche aggiornate e inviare una domanda alla chat.
 
-Per provarla, scegli **“Prova la beta con dati sintetici”**, completa l'orientamento e il consenso separato per i soli dati sintetici, quindi consulta la panoramica. Dopo il deploy dell'aggiornamento, dalla panoramica usa **“Scegli uno scenario”** oppure apri **Profilo → Dati e consensi** per selezionare **Atleta in equilibrio**, **Sovraccarico**, **Calo della HRV** o **Settimana di scarico**; torna alla panoramica per vedere le metriche e usa BioPulse AI per interrogare l'agente. Ogni sessione ospite ha un profilo separato e temporaneo (due ore) con limiti alle richieste; gli avvisi esterni sono disabilitati. Non inserire dati personali o sanitari reali: nessuno scenario proviene da uno smartwatch.
+**Come provarla:** premi **“Prova la beta con dati sintetici”**, completa l'orientamento, conferma la presa visione e seleziona il consenso separato ai dati simulati. La panoramica parte dallo scenario di sovraccarico; per cambiare caso scegli **“Scegli uno scenario”** nella panoramica oppure apri **Profilo → Dati e consensi** e seleziona **Atleta in equilibrio**, **Sovraccarico**, **Calo della HRV** o **Settimana di scarico**. Torna alla panoramica per confrontare i dati e apri **BioPulse AI** per porre una domanda; puoi poi rientrare nel profilo e cambiare scenario. L'accesso ospite è temporaneo (due ore), isolato e limitato nelle richieste; gli avvisi esterni sono disattivati. Usa esclusivamente dati e messaggi sintetici: non è collegato uno smartwatch reale, né un allenatore o professionista.
 
-La beta online usa un frontend Next.js su Vercel e un'API FastAPI con PostgreSQL/pgvector e Redis su Render; la chiave Groq resta un segreto del backend. I piani gratuiti possono sospendere o rimuovere risorse, quindi la demo è una preview temporanea, non un servizio sempre disponibile. Per istruzioni, variabili e collaudo vedere [la guida di deploy gratuito](./docs/DEPLOY_FREE.md). Tenere come riserva la [procedura di avvio locale](#avvio-rapido) e il video dimostrativo.
+**Come è collegata:** GitHub è la sorgente del codice; Vercel costruisce e serve il frontend Next.js con `frontend/` come directory radice. Il rewrite definito in `frontend/next.config.mjs` inoltra `/api/*` al backend FastAPI su Render tramite `BIOPULSE_API_ORIGIN`, mantenendo le chiamate sul dominio Vercel per cookie, protezione CSRF e chat in streaming; PostgreSQL/pgvector e Redis/Key Value forniscono i servizi dati su Render. Quando configurata, la chiave Groq è conservata solo come segreto server-side su Render e non nel repository o nelle variabili `NEXT_PUBLIC_*`. La procedura per collegare o ricreare le risorse, configurare le variabili e verificare un deploy è descritta nella [guida Vercel/Render](./docs/DEPLOY_FREE.md); include anche i limiti dei piani gratuiti. Per una dimostrazione senza rete resta disponibile l'[avvio locale](#9-avvio-rapido); è consigliato preparare anche il video dimostrativo.
 
-## 7. Portale e primo accesso
+## 8. Portale e primo accesso
 
 L'interfaccia separa accesso (`/`), orientamento e configurazione iniziale (`/onboarding`), panoramica biometrica (`/dashboard`), chat esplicabile (`/assistant`) e profilo (`/profile`). Le informative prototipali sono consultabili anche senza accesso su `/privacy`, `/cookies` e `/ethics`. Il primo accesso presenta il flusso di orientamento; la conferma richiesta documenta la presa visione nella demo, ma non è un consenso legale né abilita il trattamento biometrico.
 
@@ -67,7 +67,7 @@ La chat integra **Pulsi**, la mascotte SVG animata dalla cartella `biomascotte`:
 
 ---
 
-## Avvio rapido
+## 9. Avvio rapido
 
 Requisiti: Docker Desktop (per Postgres/Redis), Python 3.12, Node.js (verificato con 26.13.0), VS Code. Una chiave Groq gratuita da <https://console.groq.com> è consigliata ma **non obbligatoria** (senza, l'agente risponde con regole deterministiche).
 
@@ -110,7 +110,7 @@ npm ci
 npm run dev
 ```
 
-## Test
+## 10. Test
 
 ```powershell
 Set-Location backend
@@ -134,7 +134,7 @@ Verifiche e limiti dell'ultimo ambiente sono registrati in `docs/TEST_RESULTS.tx
 
 Per la companion app, dalla cartella `mobile/` eseguire `npm run typecheck` e `npm test`. I test attuali coprono la normalizzazione giornaliera sintetica; non sostituiscono le prove su development build e dispositivi iOS/Android.
 
-## Struttura
+## 11. Struttura
 
 ```
 backend/app/whitebox/   metriche deterministiche + sanificazione (solo libreria standard)
@@ -144,7 +144,7 @@ frontend/               Next.js: login/onboarding, dashboard, agente, profilo e 
 docs/                   architettura, brief ufficiale, copione video, risultati
 ```
 
-## Limiti noti
+## 12. Limiti noti
 
 Dati simulati; nessun dispositivo o account wearable reale è ancora collegato. La companion app ha adapter locali per HealthKit e Health Connect, ma non una sincronizzazione backend: prima di abilitarla servono autenticazione mobile, contratto di ingestion con provenienza/idempotenza e prove su development build e dispositivi. Per fornitori diretti serviranno credenziali autorizzate e test esclusivamente con sandbox/dati sintetici; il simulatore attuale verifica il flusso ma non prova OAuth, disponibilità del provider o sincronizzazione live. L'ACWR è un indicatore di supporto la cui validità predittiva è discussa in letteratura; i guardrail sono regole testuali con corpora piccoli e fonti non revisionate. Il recupero password self-service e gli inviti email restano assenti; in demo locale il reset è amministrativo. Le migrazioni versionate sono in `backend/migrations/` e i passaggi di backup/ripristino sono in `docs/OPERATIONS.md`; restano necessarie una policy per la conservazione dei backup e dei log e una verifica operativa prima di un rilascio. Il login limita a 10 tentativi per IP ogni 15 minuti (Redis in produzione, memoria locale in sviluppo); il reverse proxy di produzione deve essere configurato in modo che l'indirizzo IP affidabile del client sia disponibile. I periodi di 12/24 mesi sono valori tecnici configurabili, da validare con il titolare del trattamento e un consulente privacy/legale. Il sistema non è un dispositivo medico e non ha validazione clinica.
 
