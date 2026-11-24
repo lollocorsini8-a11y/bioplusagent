@@ -147,3 +147,10 @@ docs/                   architettura, brief ufficiale, copione video, risultati
 ## Limiti noti
 
 Dati simulati; nessun dispositivo o account wearable reale è ancora collegato. La companion app ha adapter locali per HealthKit e Health Connect, ma non una sincronizzazione backend: prima di abilitarla servono autenticazione mobile, contratto di ingestion con provenienza/idempotenza e prove su development build e dispositivi. Per fornitori diretti serviranno credenziali autorizzate e test esclusivamente con sandbox/dati sintetici; il simulatore attuale verifica il flusso ma non prova OAuth, disponibilità del provider o sincronizzazione live. L'ACWR è un indicatore di supporto la cui validità predittiva è discussa in letteratura; i guardrail sono regole testuali con corpora piccoli e fonti non revisionate. Il recupero password self-service e gli inviti email restano assenti; in demo locale il reset è amministrativo. Le migrazioni versionate sono in `backend/migrations/` e i passaggi di backup/ripristino sono in `docs/OPERATIONS.md`; restano necessarie una policy per la conservazione dei backup e dei log e una verifica operativa prima di un rilascio. Il login limita a 10 tentativi per IP ogni 15 minuti (Redis in produzione, memoria locale in sviluppo); il reverse proxy di produzione deve essere configurato in modo che l'indirizzo IP affidabile del client sia disponibile. I periodi di 12/24 mesi sono valori tecnici configurabili, da validare con il titolare del trattamento e un consulente privacy/legale. Il sistema non è un dispositivo medico e non ha validazione clinica.
+
+
+## Link video dimostrativo/esplicativo YouTube
+https://youtu.be/B4ZneLie2Bg?si=9e_iSJHx3LuZAGwR
+
+## IMPORTANTE
+Se si segue il link vercel per visionare il progetto, in quanto esso è collegato al piano gratuito di render per farlo funzionare, è necessario attendere circa un minuto per poter accedere; è consigliato ricaricare la pagina fin quando non appare la scritta "prova la beta" dalla quale accedere senza registrazione.
